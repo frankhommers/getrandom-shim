@@ -26,7 +26,13 @@ fixes the aarch64 build (`openat` instead of `open`), handles short reads and
 ## Usage
 
 The image `ghcr.io/frankhommers/getrandom-shim` (amd64 and arm64) copies
-`getrandom_shim.so` into a volume and exits. Mount that volume into the
+`getrandom_shim.so` into a volume and exits. It is `FROM scratch` and contains
+only the shim and a tiny static installer, also libc-free: about 5 KB on amd64
+and 87 KB on arm64, most of which is 64K page alignment.
+
+Docker Engine 28+ could mount the image directly (`type: image`) and skip the
+init container, but Synology's Container Manager ships Docker 24, so this uses
+the copy-to-volume approach. Mount that volume into the
 affected service and preload the shim:
 
 ```yaml
